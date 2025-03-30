@@ -1,0 +1,46 @@
+public class GlobalInfoHelper {
+
+    // A static array that can be accessed anywhere
+    public static String[] Categories = {
+            "Pet food and accessories" ,
+            "Baking" ,
+            "Oil" ,
+            "Instant meals" ,
+            "Side dishes" ,
+            "Condiments" ,
+            "Packaged milk" ,
+            "Hot beverages",
+            "Coffee",
+            "High demand (gluten-free, brown rice, energy drinks, instant coffee)",
+            "Medicine",
+            "Canned lentils",
+            "Dry lentils",
+            "Dry chickpeas",
+            "Peanut butter and Nutella",
+            "Kraft Dinner",
+            "Crackers",
+            "Granola bars",
+            "Cookies",
+            "Miscellaneous snacks",
+            "Chips",
+            "Fish and meat",
+            "Soup/stew with meat",
+            "Soup/stew vegetarian",
+            "Packaged fruit",
+            "Pasta sauce/canned tomatoes",
+            "Pasta and Noodles",
+            "Rice",
+            "Packaged vegetables",
+            "Canned beans",
+            "Dry beans",
+            "Baked beans",
+            "Baby food and formula",
+            "Bottled water",
+            "Flour",
+            "Juice",
+            "Cold beverages",
+            "Oatmeal",
+            "Cereal"
+    };
+
+}

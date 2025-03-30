@@ -13,12 +13,6 @@ public class Container {
         this.contents.add(item);
     }
 
-    public int getRequiredTime() {
-        int count = 0;
-        for (int i = 0; i < contents.size(); i++) {
-            count += contents.get(i).timeToSort;
-        }
-        return count;
-    }
+
     
 }
