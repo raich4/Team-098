@@ -83,8 +83,17 @@ public class Worker {
         }
     }
 
-    public void separateCategory() {
+    public void separateCategory(ArrayList<Container> stock, ArrayList<Item> table) {
 
+        // Note we reverse traverse here due to removing elements changing the index.
+        for (int i = table.size() - 1; i >= 0; i--) {
+            for (int j = 0; j < stock.size(); j++) {
+                if ( table.get(i).getType().equals( stock.get(j).getType() ) ) {
+                    stock.get(j).addItem( table.get(i) );
+                }
+            }
+
+        }
     }
 
 }

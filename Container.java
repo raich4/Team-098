@@ -2,8 +2,8 @@ import java.util.ArrayList;
 
 public class Container {
 
-    String type;
-    ArrayList<Item> contents;
+    private String type;
+    private ArrayList<Item> contents;
 
     public Container(String type) {
         this.type = type;
@@ -13,6 +13,8 @@ public class Container {
         this.contents.add(item);
     }
 
-
+    public String getType() {
+        return this.type;
+    }
     
 }
