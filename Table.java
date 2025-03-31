@@ -2,9 +2,9 @@ import java.util.ArrayList;
 
 public class Table {
 
-    int[] oldestDate = new int[3];
-    int[] newestDate = new int[3];
-    ArrayList<Item> contents;
+    private int[] oldestDate = new int[3];
+    private int[] newestDate = new int[3];
+    private ArrayList<Item> contents;
 
     public Table(int oldestYr, int oldestMon, int oldestDay, int newestYr, int newestMon, int newestDay) {
         this.oldestDate[0] = oldestYr;
@@ -15,6 +15,16 @@ public class Table {
         this.newestDate[2] = newestDay;
     }
 
+    public int[] getOldestDate() {
+        return this.oldestDate;
+    }
 
+    public int[] getNewestDate() {
+        return this.newestDate;
+    }
+
+    public void addItem(Item item) {
+        this.contents.add(item);
+    }
 
 }

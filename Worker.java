@@ -5,10 +5,12 @@ public class Worker {
 
     String name;
     double readErrorRate;
+    double placeErrorRate;
 
-    public Worker(String name, double readErrorRate) {
+    public Worker(String name, double readErrorRate, double placeErrorRate) {
         this.name = name;
         this.readErrorRate = readErrorRate;
+        this.placeErrorRate = placeErrorRate;
     }
 
     // Compares two dates inputted and returns the number of the newest one.
@@ -46,6 +48,39 @@ public class Worker {
             }
         }
         return newest;
+    }
+
+    public int[] findOldestDate(ArrayList<Item> batch) {
+        Random rand = new Random();
+        int[] oldest = {2050, 0, 0};
+        for (int i = 0; i < batch.size(); i++) {
+            if (rand.nextDouble() < readErrorRate) {
+                continue;
+            }
+            if (compareDate(batch.get(i).getExpDate(), oldest) == 0) {
+                oldest = batch.get(i).getExpDate();
+            }
+        }
+        return oldest;
+    }
+
+    public void separate(Table table, ArrayList<Item> batch) {
+        Random rand = new Random();
+        for (int i = batch.size() - 1; i >= 0; i--) {
+
+            // Due to potential error, volunteer randomly puts an item onto the table.
+            // This item may not necessarily belong to this table.
+            if (rand.nextDouble() < placeErrorRate) {
+                table.addItem(batch.get(i));
+                batch.remove(i);
+                continue;
+            }
+            if (compareDate(batch.get(i).getExpDate(), table.getNewestDate()) == 2 &&
+                    compareDate(batch.get(i).getExpDate(), table.getOldestDate()) == 1) {
+                table.addItem(batch.get(i));
+                batch.remove(i);
+            }
+        }
     }
 
 }
