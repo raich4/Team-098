@@ -1,9 +1,9 @@
 import java.util.Random;
 
 public class Item {
-    String type;
-    int[] expiryDate = new int[3]; // Date format is in: {Year, Month, Day}
-    boolean isDefective;
+    private String type;
+    private int[] expiryDate = new int[3]; // Date format is in: {Year, Month, Day}
+    private boolean isDefective;
 
     // No argument constructor for an item. This randomizes every value in a reasonable way.
     // NEEDS CONFIRMATION
@@ -46,7 +46,17 @@ public class Item {
         this.isDefective = isDefective;
     }
 
+    public int[] getExpDate(){
+        return this.expiryDate;
+    }
 
+    public String getType() {
+        return this.type;
+    }
+
+    public boolean isDefective() {
+        return this.isDefective;
+    }
 
 }
 
