@@ -64,7 +64,7 @@ public class Worker {
         return oldest;
     }
 
-    public void separate(Table table, ArrayList<Item> batch) {
+    public void separateDate(Table table, ArrayList<Item> batch) {
         Random rand = new Random();
         for (int i = batch.size() - 1; i >= 0; i--) {
 
@@ -81,6 +81,10 @@ public class Worker {
                 batch.remove(i);
             }
         }
+    }
+
+    public void separateCategory() {
+
     }
 
 }
