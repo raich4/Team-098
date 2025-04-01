@@ -58,6 +58,10 @@ public class Item {
         return this.isDefective;
     }
 
+    public void printItem() {
+        System.out.println("<" + this.type + ", EXP: " + expiryDate[0] + "/" + expiryDate[1] + "/" + expiryDate[2] + ", isDefective: " + isDefective + ">");
+    }
+
 }
 
 

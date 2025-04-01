@@ -4,7 +4,7 @@ public class Table {
 
     private int[] oldestDate = new int[3];
     private int[] newestDate = new int[3];
-    private ArrayList<Item> contents;
+    private ArrayList<Item> contents = new ArrayList<Item>();
 
     public Table(int oldestYr, int oldestMon, int oldestDay, int newestYr, int newestMon, int newestDay) {
         this.oldestDate[0] = oldestYr;

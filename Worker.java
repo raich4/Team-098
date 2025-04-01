@@ -85,15 +85,24 @@ public class Worker {
 
     public void separateCategory(ArrayList<Container> stock, ArrayList<Item> table) {
 
+        Random rand = new Random();
+
         // Note we reverse traverse here due to removing elements changing the index.
-        for (int i = table.size() - 1; i >= 0; i--) {
-            for (int j = 0; j < stock.size(); j++) {
+        for (int j = 0; j < stock.size(); j++) { // Outer loop for all categories.
+            for (int i = table.size() - 1; i >= 0; i--) { // Inner loop for all items on a table
+                if (rand.nextDouble() < placeErrorRate) {
+                    stock.get(j).addItem( table.get(i) );
+                    table.remove(i);
+                    continue;
+                }
+
                 if ( table.get(i).getType().equals( stock.get(j).getType() ) ) {
                     stock.get(j).addItem( table.get(i) );
+                    table.remove(i);
                 }
             }
-
         }
+
     }
 
 }

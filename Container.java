@@ -3,10 +3,23 @@ import java.util.ArrayList;
 public class Container {
 
     private String type;
-    private ArrayList<Item> contents;
+    private ArrayList<Item> contents = new ArrayList<Item>();
 
-    public Container(String type) {
-        this.type = type;
+    public Container() {
+
+    }
+
+    public void initializeBatch(int num) {
+        this.setType("NULL");
+        for (int i = 0; i < num; i++) {
+            this.addItem(new Item());
+        }
+    }
+
+    public void printContainer() {
+        for (int i = 0; i < this.contents.size(); i++) {
+            this.contents.get(i).printItem();
+        }
     }
 
     public void addItem(Item item) {
@@ -15,6 +28,10 @@ public class Container {
 
     public String getType() {
         return this.type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
     
 }
