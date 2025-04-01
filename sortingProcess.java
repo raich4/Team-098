@@ -1,13 +1,21 @@
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class sortingProcess {
 
     public static void main(String[] args) {
 
-        Container pallet = new Container();
-        Worker jason = new Worker("Jason", 0.01, 0.01);
+        Scanner scanner = new Scanner(System.in);
 
-        pallet.initializeBatch(10);
+        Container pallet = new Container();
+        Worker jason = new Worker("Jason", 0.02, 0.02);
+        DecimalFormat df = new DecimalFormat("#.##");
+
+        System.out.println("Enter number of items: ");
+        int numItems = scanner.nextInt();
+
+        pallet.initializeBatch(numItems);
         pallet.printContainer();
 
         // Three sorting tables
@@ -34,9 +42,11 @@ public class sortingProcess {
         jason.separateDate(cutoffTable, pallet.getContents());
         jason.separateDate(newTable, pallet.getContents());
 
-        ArrayList<Container> stock = new ArrayList<Container>();
+        ArrayList<Container> oldStock = new ArrayList<>();
+        ArrayList<Container> newStock = new ArrayList<>();
         for (int i = 0; i < GlobalInfoHelper.Categories.length; i++) {
-            stock.add(new Container(GlobalInfoHelper.Categories[i]));
+            oldStock.add(new Container(GlobalInfoHelper.Categories[i]));
+            newStock.add(new Container(GlobalInfoHelper.Categories[i]));
         }
 
 
@@ -55,8 +65,17 @@ public class sortingProcess {
             newTable.getContents().get(i).printItem();
         }
 
-        jason.separateCategory(stock, oldTable.getContents());
-        jason.separateCategory(stock, cutoffTable.getContents());
+        jason.separateCategory(oldStock, oldTable.getContents());
+        jason.separateCategory(oldStock, cutoffTable.getContents());
+
+
+
+        jason.separateCategory(newStock, newTable.getContents());
+
+        int itemsMissed = pallet.getContents().size() + oldTable.getContents().size() + cutoffTable.getContents().size() + newTable.getContents().size();
+        double error = ((double)itemsMissed / numItems) * 100;
+
+        System.out.println("Error rate: " + df.format(error) + "%.");
 
     }
 
