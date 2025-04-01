@@ -57,7 +57,7 @@ public class Worker {
             if (rand.nextDouble() < readErrorRate) {
                 continue;
             }
-            if (compareDate(batch.get(i).getExpDate(), oldest) == 0) {
+            if (compareDate(batch.get(i).getExpDate(), oldest) == 2) {
                 oldest = batch.get(i).getExpDate();
             }
         }
@@ -71,12 +71,14 @@ public class Worker {
             // Due to potential error, volunteer randomly puts an item onto the table.
             // This item may not necessarily belong to this table.
             if (rand.nextDouble() < placeErrorRate) {
-                table.addItem(batch.get(i));
-                batch.remove(i);
                 continue;
             }
-            if (compareDate(batch.get(i).getExpDate(), table.getNewestDate()) == 2 &&
-                    compareDate(batch.get(i).getExpDate(), table.getOldestDate()) == 1) {
+            if ( (compareDate(batch.get(i).getExpDate(), table.getNewestDate()) == 2 ||
+                  compareDate(batch.get(i).getExpDate(), table.getNewestDate()) == 0)
+                  &&
+                  (compareDate(batch.get(i).getExpDate(), table.getOldestDate()) == 1 ||
+                  compareDate(batch.get(i).getExpDate(), table.getOldestDate()) == 0) ) {
+
                 table.addItem(batch.get(i));
                 batch.remove(i);
             }
@@ -91,8 +93,6 @@ public class Worker {
         for (int j = 0; j < stock.size(); j++) { // Outer loop for all categories.
             for (int i = table.size() - 1; i >= 0; i--) { // Inner loop for all items on a table
                 if (rand.nextDouble() < placeErrorRate) {
-                    stock.get(j).addItem( table.get(i) );
-                    table.remove(i);
                     continue;
                 }
 

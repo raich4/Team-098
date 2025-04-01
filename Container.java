@@ -1,3 +1,4 @@
+import java.awt.event.ItemEvent;
 import java.util.ArrayList;
 
 public class Container {
@@ -7,6 +8,10 @@ public class Container {
 
     public Container() {
 
+    }
+
+    public Container(String type) {
+        this.type = type;
     }
 
     public void initializeBatch(int num) {
@@ -32,6 +37,10 @@ public class Container {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public ArrayList<Item> getContents() {
+        return this.contents;
     }
     
 }

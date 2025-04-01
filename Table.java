@@ -6,7 +6,21 @@ public class Table {
     private int[] newestDate = new int[3];
     private ArrayList<Item> contents = new ArrayList<Item>();
 
+    // No argument constructor
+    public Table() {
+
+    }
+
     public Table(int oldestYr, int oldestMon, int oldestDay, int newestYr, int newestMon, int newestDay) {
+        this.oldestDate[0] = oldestYr;
+        this.oldestDate[1] = oldestMon;
+        this.oldestDate[2] = oldestDay;
+        this.newestDate[0] = newestYr;
+        this.newestDate[1] = newestMon;
+        this.newestDate[2] = newestDay;
+    }
+
+    public void setDates(int oldestYr, int oldestMon, int oldestDay, int newestYr, int newestMon, int newestDay) {
         this.oldestDate[0] = oldestYr;
         this.oldestDate[1] = oldestMon;
         this.oldestDate[2] = oldestDay;
@@ -25,6 +39,10 @@ public class Table {
 
     public void addItem(Item item) {
         this.contents.add(item);
+    }
+
+    public ArrayList<Item> getContents() {
+        return this.contents;
     }
 
 }
