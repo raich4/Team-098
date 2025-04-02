@@ -17,10 +17,10 @@ public class Item {
         // Assigning each item a random expiry date between 2024 and 2026.
         // This also takes into account the number of days in a month, including leap years.
         // 2024 is a leap year.
-        this.expiryDate[0] = rand.nextInt(3) + 2024;
+        this.expiryDate[0] = rand.nextInt(5) + 2024; // Change to 2027
         this.expiryDate[1] = rand.nextInt(12) + 1;
         if (this.expiryDate[1] == 2) {
-            if (this.expiryDate[0] == 2024) {
+            if (this.expiryDate[0] == 2024 || this.expiryDate[0] == 2028) {
                 this.expiryDate[2] = rand.nextInt(29) + 1;
             }
             else {
