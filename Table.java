@@ -1,10 +1,11 @@
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Table {
 
-    private int[] oldestDate = new int[3];
-    private int[] newestDate = new int[3];
-    private ArrayList<Item> contents = new ArrayList<Item>();
+    private LocalDate oldestDate;
+    private LocalDate newestDate;
+    private ArrayList<Item> contents = new ArrayList<>();
 
     // No argument constructor
     public Table() {
@@ -12,28 +13,20 @@ public class Table {
     }
 
     public Table(int oldestYr, int oldestMon, int oldestDay, int newestYr, int newestMon, int newestDay) {
-        this.oldestDate[0] = oldestYr;
-        this.oldestDate[1] = oldestMon;
-        this.oldestDate[2] = oldestDay;
-        this.newestDate[0] = newestYr;
-        this.newestDate[1] = newestMon;
-        this.newestDate[2] = newestDay;
+        this.oldestDate = LocalDate.of(oldestYr, oldestMon, oldestDay);
+        this.newestDate = LocalDate.of(newestYr, newestMon, newestDay);
     }
 
     public void setDates(int oldestYr, int oldestMon, int oldestDay, int newestYr, int newestMon, int newestDay) {
-        this.oldestDate[0] = oldestYr;
-        this.oldestDate[1] = oldestMon;
-        this.oldestDate[2] = oldestDay;
-        this.newestDate[0] = newestYr;
-        this.newestDate[1] = newestMon;
-        this.newestDate[2] = newestDay;
+        this.oldestDate = LocalDate.of(oldestYr, oldestMon, oldestDay);
+        this.newestDate = LocalDate.of(newestYr, newestMon, newestDay);
     }
 
-    public int[] getOldestDate() {
+    public LocalDate getOldestDate() {
         return this.oldestDate;
     }
 
-    public int[] getNewestDate() {
+    public LocalDate getNewestDate() {
         return this.newestDate;
     }
 
