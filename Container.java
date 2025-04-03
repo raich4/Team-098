@@ -42,5 +42,9 @@ public class Container {
     public ArrayList<Item> getContents() {
         return this.contents;
     }
+
+    public boolean isEmpty() {
+        return contents.isEmpty();
+    }
     
 }
