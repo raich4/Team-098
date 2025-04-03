@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class sortingProcess {
@@ -16,17 +17,14 @@ public class sortingProcess {
         Table newTable = new Table();
 
         // Finding the oldest and the newest dates
-        int[] oldestDate = jason.findOldestDate(pallet.getContents());
-        int[] newestDate = jason.findNewestDate(pallet.getContents());
+        LocalDate oldestDate = jason.findOldestDate(pallet.getContents());
+        LocalDate newestDate = jason.findNewestDate(pallet.getContents());
 
-        System.out.println("Oldest Year: " + oldestDate[0]);
-        System.out.println("Newest Year: " + newestDate[0]);
+        int cutoff = (oldestDate.getYear() + newestDate.getYear()) / 2;
 
-        int cutoff = (oldestDate[0] + newestDate[0]) / 2;
-
-        oldTable.setDates(oldestDate[0], oldestDate[1], oldestDate[2], cutoff - 1, 12, 31);
+        oldTable.setDates(oldestDate.getYear(), oldestDate.getMonthValue(), oldestDate.getDayOfMonth(), cutoff - 1, 12, 31);
         cutoffTable.setDates(cutoff, 1, 1, cutoff, 12, 31);
-        newTable.setDates(cutoff + 1, 1, 1, newestDate[0], newestDate[1], newestDate[2]);
+        newTable.setDates(cutoff + 1, 1, 1, newestDate.getYear(), newestDate.getMonthValue(), newestDate.getDayOfMonth());
 
         System.out.println("Cutoff year: " + cutoff);
 

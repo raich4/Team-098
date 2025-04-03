@@ -1,12 +1,12 @@
+import java.time.LocalDate;
 import java.util.Random;
 
 public class Item {
     private String type;
-    private int[] expiryDate = new int[3]; // Date format is in: {Year, Month, Day}
+    private LocalDate expiryDate; // Using LocalDate instead of int[] for the expiry date
     private boolean isDefective;
 
     // No argument constructor for an item. This randomizes every value in a reasonable way.
-    // NEEDS CONFIRMATION
     public Item() {
         Random rand = new Random();
 
@@ -15,38 +15,25 @@ public class Item {
         this.type = GlobalInfoHelper.Categories[rand.nextInt(39)];
 
         // Assigning each item a random expiry date between 2024 and 2026.
-        // This also takes into account the number of days in a month, including leap years.
-        // 2024 is a leap year.
-        this.expiryDate[0] = rand.nextInt(3) + 2024;
-        this.expiryDate[1] = rand.nextInt(12) + 1;
-        if (this.expiryDate[1] == 2) {
-            if (this.expiryDate[0] == 2024) {
-                this.expiryDate[2] = rand.nextInt(29) + 1;
-            }
-            else {
-                this.expiryDate[2] = rand.nextInt(28) + 1;
-            }
-        }
-        else if (this.expiryDate[1] == 4 || this.expiryDate[1] == 6 || this.expiryDate[1] == 9 || this.expiryDate[1] == 11) {
-            this.expiryDate[2] = rand.nextInt(30) + 1;
-        }
-        else {
-            this.expiryDate[2] = rand.nextInt(31) + 1;
-        }
+        int year = rand.nextInt(3) + 2024;         // 2024, 2025, or 2026
+        int month = rand.nextInt(12) + 1;            // 1 to 12
+        // Create a temporary date to determine the maximum day in that month.
+        int maxDay = LocalDate.of(year, month, 1).lengthOfMonth();
+        int day = rand.nextInt(maxDay) + 1;          // 1 to maxDay
 
-        //Assume every item has a 1% chance to be defective (NEEDS CONFIRMATION)
+        this.expiryDate = LocalDate.of(year, month, day);
+
+        // Assume every item has a 1% chance to be defective.
         this.isDefective = (rand.nextInt(100) == 0);
     }
 
     public Item(String type, int expYr, int expMon, int expDay, boolean isDefective) {
         this.type = type;
-        this.expiryDate[0] = expYr;
-        this.expiryDate[1] = expMon;
-        this.expiryDate[2] = expDay;
+        this.expiryDate = LocalDate.of(expYr, expMon, expDay);
         this.isDefective = isDefective;
     }
 
-    public int[] getExpDate(){
+    public LocalDate getExpDate() {
         return this.expiryDate;
     }
 
@@ -59,9 +46,6 @@ public class Item {
     }
 
     public void printItem() {
-        System.out.println("<" + this.type + ", EXP: " + expiryDate[0] + "/" + expiryDate[1] + "/" + expiryDate[2] + ", isDefective: " + isDefective + ">");
+        System.out.println("<" + this.type + ", EXP: " + expiryDate + ", isDefective: " + isDefective + ">");
     }
-
 }
-
-

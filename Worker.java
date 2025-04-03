@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -13,51 +14,28 @@ public class Worker {
         this.placeErrorRate = placeErrorRate;
     }
 
-    // Compares two dates inputted and returns the number of the newest one.
-    public int compareDate(int[] date1, int[] date2) {
-        if (date1[0] > date2[0]) {
-            return 1;
-        }
-        else if (date1[0] < date2[0]) {
-            return 2;
-        }
-        if (date1[1] > date2[1]) {
-            return 1;
-        }
-        else if (date1[1] < date2[1]) {
-            return 2;
-        }
-        if (date1[2] > date2[2]) {
-            return 1;
-        }
-        else if (date1[2] < date2[2]) {
-            return 2;
-        }
-        return 0;
-    }
-
-    public int[] findNewestDate(ArrayList<Item> batch){
+    public LocalDate findNewestDate(ArrayList<Item> batch){
         Random rand = new Random();
-        int[] newest = {2000, 0, 0};
+        LocalDate newest = LocalDate.of(2000, 1, 1);
         for (int i = 0; i < batch.size(); i++) {
             if (rand.nextDouble() < readErrorRate) {
                 continue;
             }
-            if (compareDate(batch.get(i).getExpDate(), newest) == 1) {
+            if (batch.get(i).getExpDate().isAfter(newest)) {
                 newest = batch.get(i).getExpDate();
             }
         }
         return newest;
     }
 
-    public int[] findOldestDate(ArrayList<Item> batch) {
+    public LocalDate findOldestDate(ArrayList<Item> batch) {
         Random rand = new Random();
-        int[] oldest = {2050, 0, 0};
+        LocalDate oldest = LocalDate.of(2050,1,1);
         for (int i = 0; i < batch.size(); i++) {
             if (rand.nextDouble() < readErrorRate) {
                 continue;
             }
-            if (compareDate(batch.get(i).getExpDate(), oldest) == 2) {
+            if (batch.get(i).getExpDate().isBefore(oldest)) {
                 oldest = batch.get(i).getExpDate();
             }
         }
@@ -73,11 +51,11 @@ public class Worker {
             if (rand.nextDouble() < placeErrorRate) {
                 continue;
             }
-            if ( (compareDate(batch.get(i).getExpDate(), table.getNewestDate()) == 2 ||
-                  compareDate(batch.get(i).getExpDate(), table.getNewestDate()) == 0)
+            if ( ( batch.get(i).getExpDate().isBefore(table.getNewestDate()) ||
+                  batch.get(i).getExpDate().equals(table.getNewestDate()))
                   &&
-                  (compareDate(batch.get(i).getExpDate(), table.getOldestDate()) == 1 ||
-                  compareDate(batch.get(i).getExpDate(), table.getOldestDate()) == 0) ) {
+                  (batch.get(i).getExpDate().isAfter(table.getOldestDate()) ||
+                  batch.get(i).getExpDate().equals(table.getNewestDate()) ) ) {
 
                 table.addItem(batch.get(i));
                 batch.remove(i);
