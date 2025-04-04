@@ -10,7 +10,7 @@ public class sortingProcess {
 
         LocalDate currentDate = LocalDate.of(2024,1,1);
         int simulationDays = 30; // Total days to simulate
-        int dailyShipmentSize = 3; // Placeholder shipment size
+        int dailyShipmentSize = 9; // Placeholder shipment size
 
         ArrayList<Container> inputRack = new ArrayList<>();
 
@@ -32,7 +32,7 @@ public class sortingProcess {
         for (int day = 0; day < simulationDays; day++) {
             System.out.println("Simulation Date: " + currentDate);
 
-            itemArrives(inputRack);
+            itemArrives(inputRack, 9);
             // Simulate the sorting process during the day
             // This can be broken down further into smaller time steps if needed
             simulateSortingForDay(inputRack, oldStock, newStock, bin, outputRack);
@@ -46,15 +46,17 @@ public class sortingProcess {
         }
 
         int binCount = bin.getContents().size();
-        double waste = ((double)binCount / (simulationDays * 1000) ) * 100;
+        double waste = ((double)binCount / (simulationDays * 1000 * dailyShipmentSize) ) * 100;
 
         System.out.println("Waste: " + waste + "%");
     }
 
-    private static void itemArrives (ArrayList<Container> inputRack) {
-        Container pallet = new Container();
-        pallet.initializeBatch(1000);
-        inputRack.add(pallet);
+    private static void itemArrives (ArrayList<Container> inputRack, int numPallets) {
+        for (int i = 0; i < numPallets; i++){
+            Container pallet = new Container();
+            pallet.initializeBatch(1000);
+            inputRack.add(pallet);
+        }
     }
 
     private static void simulateSortingForDay(ArrayList<Container> inputRack, ArrayList<Container> oldStock, ArrayList<Container> newStock, Container bin, ArrayList<Container> outputRack) {
@@ -72,9 +74,9 @@ public class sortingProcess {
         while(!timeOfDay.isAfter(LocalTime.of(15,0))) {
 
             int maxMinutes = 0;
-            if (pallet.isEmpty()){
-                pallet = inputRack.get(0);
-                inputRack.remove(0);
+            if (pallet.isEmpty() && !inputRack.isEmpty()){
+                pallet = inputRack.getFirst();
+                inputRack.removeFirst();
 
                 maxMinutes = 5;
             }
@@ -97,6 +99,8 @@ public class sortingProcess {
 
                 bin.getContents().addAll(pallet.getContents());
 
+                pallet.getContents().clear();
+
                 maxMinutes = 30;
 
             }
@@ -106,11 +110,15 @@ public class sortingProcess {
                 jason.separateCategory(oldStock, oldTable.getContents(), outputRack);
                 jason.separateCategory(oldStock, cutoffTable.getContents(), outputRack);
 
-                jason.separateCategory(newStock, cutoffTable.getContents(), outputRack);
+                jason.separateCategory(newStock, newTable.getContents(), outputRack);
 
                 bin.getContents().addAll(oldTable.getContents());
                 bin.getContents().addAll(cutoffTable.getContents());
                 bin.getContents().addAll(newTable.getContents());
+
+                oldTable.getContents().clear();
+                newTable.getContents().clear();
+                cutoffTable.getContents().clear();
 
                 maxMinutes = 60;
 
@@ -128,17 +136,19 @@ public class sortingProcess {
         }
 
         // Process shipping logic
-        System.out.println("  Shipping out " + shipmentSize + " items on " + date);
+        System.out.println("  Shipping out " + shipmentSize + " pallets on " + date);
 
         Random rand = new Random();
-        for (int i = 0; i < shipmentSize; i++) {
-            Container shipped = outputRack.get(rand.nextInt(outputRack.size()));
+        for (int i = 0; i < shipmentSize && !outputRack.isEmpty(); i++) {
+            Container shipped = outputRack.getFirst();
             while (!shipped.isEmpty()) {
-                if (shipped.getContents().get(0).getExpDate().isBefore(date)) {
-                    bin.addItem(shipped.getContents().get(0));
+                if (shipped.getContents().getFirst().getExpDate().isBefore(date)) {
+                    bin.addItem(shipped.getContents().getFirst());
                 }
-                shipped.getContents().remove(0);
+                shipped.getContents().removeFirst();
             }
+
+            outputRack.removeFirst();
         }
     }
 
