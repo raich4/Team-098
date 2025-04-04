@@ -63,7 +63,7 @@ public class Worker {
         }
     }
 
-    public void separateCategory(ArrayList<Container> stock, ArrayList<Item> table) {
+    public void separateCategory(ArrayList<Container> stock, ArrayList<Item> table, ArrayList<Container> outputRack) {
 
         Random rand = new Random();
 
@@ -75,9 +75,17 @@ public class Worker {
                 }
 
                 if ( table.get(i).getType().equals( stock.get(j).getType() ) ) {
+                    // Transfer the items into the outputRack if it is full.
+                    if (stock.get(j).isFull()) {
+                        outputRack.add(stock.get(j));
+                        stock.get(j).getContents().clear();
+                    }
+
                     stock.get(j).addItem( table.get(i) );
                     table.remove(i);
                 }
+
+
             }
         }
 

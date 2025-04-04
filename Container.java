@@ -5,6 +5,7 @@ public class Container {
 
     private String type;
     private ArrayList<Item> contents = new ArrayList<Item>();
+    private int maxItems = 1000;
 
     public Container() {
 
@@ -45,6 +46,10 @@ public class Container {
 
     public boolean isEmpty() {
         return contents.isEmpty();
+    }
+
+    public boolean isFull() {
+        return contents.size() >= maxItems;
     }
     
 }

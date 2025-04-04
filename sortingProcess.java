@@ -8,9 +8,9 @@ public class sortingProcess {
 
     public static void main(String[] args) {
 
-        LocalDate currentDate = LocalDate.now();
+        LocalDate currentDate = LocalDate.of(2024,1,1);
         int simulationDays = 30; // Total days to simulate
-        int dailyShipmentSize = 100; // Placeholder shipment size
+        int dailyShipmentSize = 3; // Placeholder shipment size
 
         ArrayList<Container> inputRack = new ArrayList<>();
 
@@ -35,23 +35,29 @@ public class sortingProcess {
             itemArrives(inputRack);
             // Simulate the sorting process during the day
             // This can be broken down further into smaller time steps if needed
-            simulateSortingForDay(inputRack, oldStock, newStock, bin);
+            simulateSortingForDay(inputRack, oldStock, newStock, bin, outputRack);
 
             // Process daily shipment at the end of the day
             processDailyShipment(dailyShipmentSize, currentDate, outputRack, bin);
 
             // Move to the next day
             currentDate = currentDate.plusDays(1);
+
         }
+
+        int binCount = bin.getContents().size();
+        double waste = ((double)binCount / (simulationDays * 1000) ) * 100;
+
+        System.out.println("Waste: " + waste + "%");
     }
 
     private static void itemArrives (ArrayList<Container> inputRack) {
         Container pallet = new Container();
-        pallet.initializeBatch(100);
+        pallet.initializeBatch(1000);
         inputRack.add(pallet);
     }
 
-    private static void simulateSortingForDay(ArrayList<Container> inputRack, ArrayList<Container> oldStock, ArrayList<Container> newStock, Container bin) {
+    private static void simulateSortingForDay(ArrayList<Container> inputRack, ArrayList<Container> oldStock, ArrayList<Container> newStock, Container bin, ArrayList<Container> outputRack) {
 
         LocalTime timeOfDay = LocalTime.of(9, 30);
 
@@ -63,12 +69,12 @@ public class sortingProcess {
 
         Container pallet = new Container();
 
-        while(!timeOfDay.isAfter(LocalTime.of(12,0))) {
+        while(!timeOfDay.isAfter(LocalTime.of(15,0))) {
 
             int maxMinutes = 0;
             if (pallet.isEmpty()){
-                pallet = inputRack.get(1);
-                inputRack.remove(1);
+                pallet = inputRack.get(0);
+                inputRack.remove(0);
 
                 maxMinutes = 5;
             }
@@ -89,36 +95,44 @@ public class sortingProcess {
                 jason.separateDate(cutoffTable, pallet.getContents());
                 jason.separateDate(newTable, pallet.getContents());
 
+                bin.getContents().addAll(pallet.getContents());
+
                 maxMinutes = 30;
 
             }
 
             if ( !oldTable.isEmpty() || !cutoffTable.isEmpty() || !newTable.isEmpty() ) {
 
-                jason.separateCategory(oldStock, oldTable.getContents());
-                jason.separateCategory(oldStock, cutoffTable.getContents());
+                jason.separateCategory(oldStock, oldTable.getContents(), outputRack);
+                jason.separateCategory(oldStock, cutoffTable.getContents(), outputRack);
 
-                jason.separateCategory(newStock, cutoffTable.getContents());
+                jason.separateCategory(newStock, cutoffTable.getContents(), outputRack);
+
+                bin.getContents().addAll(oldTable.getContents());
+                bin.getContents().addAll(cutoffTable.getContents());
+                bin.getContents().addAll(newTable.getContents());
+
                 maxMinutes = 60;
 
             }
 
             timeOfDay = timeOfDay.plusMinutes(maxMinutes);
 
-            // REMEMBER TO IMPLEMENT PUTTING STUFF ON THE RACK
-            // REMEMBER TO IMPLEMENT THE FULLNESS OF A CONTAINER
-
         }
 
     }
 
     private static void processDailyShipment(int shipmentSize, LocalDate date, ArrayList<Container> outputRack, Container bin) {
+        if (outputRack.isEmpty()) {
+            return;
+        }
+
         // Process shipping logic
         System.out.println("  Shipping out " + shipmentSize + " items on " + date);
 
         Random rand = new Random();
         for (int i = 0; i < shipmentSize; i++) {
-            Container shipped = outputRack.get(rand.nextInt());
+            Container shipped = outputRack.get(rand.nextInt(outputRack.size()));
             while (!shipped.isEmpty()) {
                 if (shipped.getContents().get(0).getExpDate().isBefore(date)) {
                     bin.addItem(shipped.getContents().get(0));
