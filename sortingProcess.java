@@ -1,6 +1,8 @@
+import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class sortingProcess {
 
@@ -12,6 +14,20 @@ public class sortingProcess {
 
         ArrayList<Container> inputRack = new ArrayList<>();
 
+        ArrayList<Container> oldStock = new ArrayList<Container>();
+        for (int i = 0; i < GlobalInfoHelper.Categories.length; i++) {
+            oldStock.add(new Container(GlobalInfoHelper.Categories[i]));
+        }
+
+        ArrayList<Container> newStock = new ArrayList<Container>();
+        for (int i = 0; i < GlobalInfoHelper.Categories.length; i++) {
+            newStock.add(new Container(GlobalInfoHelper.Categories[i]));
+        }
+
+        ArrayList<Container> outputRack = new ArrayList<>();
+
+        Container bin = new Container();
+
         // Main simulation loop: each iteration is one day
         for (int day = 0; day < simulationDays; day++) {
             System.out.println("Simulation Date: " + currentDate);
@@ -19,10 +35,10 @@ public class sortingProcess {
             itemArrives(inputRack);
             // Simulate the sorting process during the day
             // This can be broken down further into smaller time steps if needed
-            simulateSortingForDay(inputRack);
+            simulateSortingForDay(inputRack, oldStock, newStock, bin);
 
             // Process daily shipment at the end of the day
-            processDailyShipment(dailyShipmentSize, currentDate);
+            processDailyShipment(dailyShipmentSize, currentDate, outputRack, bin);
 
             // Move to the next day
             currentDate = currentDate.plusDays(1);
@@ -35,7 +51,7 @@ public class sortingProcess {
         inputRack.add(pallet);
     }
 
-    private static void simulateSortingForDay(ArrayList<Container> inputRack) {
+    private static void simulateSortingForDay(ArrayList<Container> inputRack, ArrayList<Container> oldStock, ArrayList<Container> newStock, Container bin) {
 
         LocalTime timeOfDay = LocalTime.of(9, 30);
 
@@ -73,76 +89,44 @@ public class sortingProcess {
                 jason.separateDate(cutoffTable, pallet.getContents());
                 jason.separateDate(newTable, pallet.getContents());
 
-
-
                 maxMinutes = 30;
 
             }
 
             if ( !oldTable.isEmpty() || !cutoffTable.isEmpty() || !newTable.isEmpty() ) {
 
+                jason.separateCategory(oldStock, oldTable.getContents());
+                jason.separateCategory(oldStock, cutoffTable.getContents());
 
+                jason.separateCategory(newStock, cutoffTable.getContents());
+                maxMinutes = 60;
 
             }
 
-        }
+            timeOfDay = timeOfDay.plusMinutes(maxMinutes);
 
-        int timeStepsInDay = 6; // e.g., one time step per hour
-        for (int step = 0; step < timeStepsInDay; step++) {
-            // Update volunteer actions, item sorting, etc.
-            System.out.println("  Time step " + step + ": Processing sorting tasks.");
-
-
-
-
+            // REMEMBER TO IMPLEMENT PUTTING STUFF ON THE RACK
+            // REMEMBER TO IMPLEMENT THE FULLNESS OF A CONTAINER
 
         }
+
     }
 
-    private static void processDailyShipment(int shipmentSize, LocalDate date) {
+    private static void processDailyShipment(int shipmentSize, LocalDate date, ArrayList<Container> outputRack, Container bin) {
         // Process shipping logic
         System.out.println("  Shipping out " + shipmentSize + " items on " + date);
+
+        Random rand = new Random();
+        for (int i = 0; i < shipmentSize; i++) {
+            Container shipped = outputRack.get(rand.nextInt());
+            while (!shipped.isEmpty()) {
+                if (shipped.getContents().get(0).getExpDate().isBefore(date)) {
+                    bin.addItem(shipped.getContents().get(0));
+                }
+                shipped.getContents().remove(0);
+            }
+        }
     }
 
 
-
-/*
-        pallet.initializeBatch(10);
-        pallet.printContainer();
-
-        // Three sorting tables
-
-
-
-
-
-
-        System.out.println("Cutoff year: " + cutoff);
-
-
-
-        ArrayList<Container> stock = new ArrayList<Container>();
-        for (int i = 0; i < GlobalInfoHelper.Categories.length; i++) {
-            stock.add(new Container(GlobalInfoHelper.Categories[i]));
-        }
-
-
-        System.out.println("OLD: ");
-        for (int i = 0; i < oldTable.getContents().size(); i++) {
-            oldTable.getContents().get(i).printItem();
-        }
-
-        System.out.println("Cutoff: ");
-        for (int i = 0; i < cutoffTable.getContents().size(); i++) {
-            cutoffTable.getContents().get(i).printItem();
-        }
-
-        System.out.println("New: ");
-        for (int i = 0; i < newTable.getContents().size(); i++) {
-            newTable.getContents().get(i).printItem();
-        }
-
-        jason.separateCategory(stock, oldTable.getContents());
-        jason.separateCategory(stock, cutoffTable.getContents());
-*/
 }
