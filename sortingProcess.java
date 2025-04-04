@@ -10,7 +10,6 @@ public class sortingProcess {
         int simulationDays = 30; // Total days to simulate
         int dailyShipmentSize = 100; // Placeholder shipment size
 
-        Worker jason = new Worker("Jason", 0.01, 0.01);
         ArrayList<Container> inputRack = new ArrayList<>();
 
         // Main simulation loop: each iteration is one day
@@ -40,6 +39,8 @@ public class sortingProcess {
 
         LocalTime timeOfDay = LocalTime.of(9, 30);
 
+        Worker jason = new Worker("Jason", 0.01, 0.01);
+
         Table oldTable = new Table();
         Table cutoffTable = new Table();
         Table newTable = new Table();
@@ -48,28 +49,50 @@ public class sortingProcess {
 
         while(!timeOfDay.isAfter(LocalTime.of(12,0))) {
 
+            int maxMinutes = 0;
             if (pallet.isEmpty()){
                 pallet = inputRack.get(1);
                 inputRack.remove(1);
 
-                timeOfDay.plusMinutes(5);
-                continue;
+                maxMinutes = 5;
+            }
+
+            if ( !pallet.isEmpty() && oldTable.isEmpty() && cutoffTable.isEmpty() && newTable.isEmpty()) {
+
+                LocalDate oldestDate = jason.findOldestDate(pallet.getContents());
+                LocalDate newestDate = jason.findNewestDate(pallet.getContents());
+
+                int cutoff = (oldestDate.getYear() + newestDate.getYear()) / 2;
+
+                oldTable.setDates(oldestDate.getYear(), oldestDate.getMonthValue(), oldestDate.getDayOfMonth(), cutoff - 1, 12, 31);
+                cutoffTable.setDates(cutoff, 1, 1, cutoff, 12, 31);
+                newTable.setDates(cutoff + 1, 1, 1, newestDate.getYear(), newestDate.getMonthValue(), newestDate.getDayOfMonth());
+
+                // Finding the oldest and the newest dates
+                jason.separateDate(oldTable, pallet.getContents());
+                jason.separateDate(cutoffTable, pallet.getContents());
+                jason.separateDate(newTable, pallet.getContents());
+
+
+
+                maxMinutes = 30;
+
+            }
+
+            if ( !oldTable.isEmpty() || !cutoffTable.isEmpty() || !newTable.isEmpty() ) {
+
+
+
             }
 
         }
 
-
-
-
-
-        // Example of breaking the day into smaller intervals
         int timeStepsInDay = 6; // e.g., one time step per hour
         for (int step = 0; step < timeStepsInDay; step++) {
             // Update volunteer actions, item sorting, etc.
             System.out.println("  Time step " + step + ": Processing sorting tasks.");
 
-            LocalDate oldestDate = jason.findOldestDate(pallet.getContents());
-            LocalDate newestDate = jason.findNewestDate(pallet.getContents());
+
 
 
 
@@ -90,20 +113,13 @@ public class sortingProcess {
         // Three sorting tables
 
 
-        // Finding the oldest and the newest dates
 
 
-        int cutoff = (oldestDate.getYear() + newestDate.getYear()) / 2;
 
-        oldTable.setDates(oldestDate.getYear(), oldestDate.getMonthValue(), oldestDate.getDayOfMonth(), cutoff - 1, 12, 31);
-        cutoffTable.setDates(cutoff, 1, 1, cutoff, 12, 31);
-        newTable.setDates(cutoff + 1, 1, 1, newestDate.getYear(), newestDate.getMonthValue(), newestDate.getDayOfMonth());
 
         System.out.println("Cutoff year: " + cutoff);
 
-        jason.separateDate(oldTable, pallet.getContents());
-        jason.separateDate(cutoffTable, pallet.getContents());
-        jason.separateDate(newTable, pallet.getContents());
+
 
         ArrayList<Container> stock = new ArrayList<Container>();
         for (int i = 0; i < GlobalInfoHelper.Categories.length; i++) {

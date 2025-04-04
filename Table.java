@@ -38,4 +38,8 @@ public class Table {
         return this.contents;
     }
 
+    public boolean isEmpty() {
+        return contents.isEmpty();
+    }
+
 }
