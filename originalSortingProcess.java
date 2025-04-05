@@ -1,8 +1,9 @@
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Random;
 
-public class sortingProcess {
+public class originalSortingProcess {
 
     public static void main(String[] args) {
 
@@ -12,14 +13,9 @@ public class sortingProcess {
 
         ArrayList<Container> inputRack = new ArrayList<>();
 
-        ArrayList<Container> oldStock = new ArrayList<Container>();
+        ArrayList<Container> stock = new ArrayList<Container>();
         for (int i = 0; i < GlobalInfoHelper.Categories.length; i++) {
-            oldStock.add(new Container(GlobalInfoHelper.Categories[i]));
-        }
-
-        ArrayList<Container> newStock = new ArrayList<Container>();
-        for (int i = 0; i < GlobalInfoHelper.Categories.length; i++) {
-            newStock.add(new Container(GlobalInfoHelper.Categories[i]));
+            stock.add(new Container(GlobalInfoHelper.Categories[i]));
         }
 
         ArrayList<Container> outputRack = new ArrayList<>();
@@ -34,7 +30,7 @@ public class sortingProcess {
             itemArrives(inputRack, 4, currentDate);
             // Simulate the sorting process during the day
             // This can be broken down further into smaller time steps if needed
-            simulateSortingForDay(inputRack, oldStock, newStock, bin, outputRack);
+            simulateSortingForDay(inputRack, stock, bin, outputRack);
 
             // Process daily shipment at the end of the day
             count += processDailyShipment(dailyShipmentSize, currentDate, outputRack, bin);
@@ -61,15 +57,15 @@ public class sortingProcess {
         }
     }
 
-    private static void simulateSortingForDay(ArrayList<Container> inputRack, ArrayList<Container> oldStock, ArrayList<Container> newStock, Container bin, ArrayList<Container> outputRack) {
+    private static void simulateSortingForDay(ArrayList<Container> inputRack, ArrayList<Container> stock, Container bin, ArrayList<Container> outputRack) {
 
         LocalTime timeOfDay = LocalTime.of(9, 30);
 
         Worker jason = new Worker("Jason", 0.01, 0.01);
 
-        Table oldTable = new Table(true);
-        Table cutoffTable = new Table(true);
-        Table newTable = new Table(false);
+        Table oldTable = new Table();
+        Table cutoffTable = new Table();
+        Table newTable = new Table();
 
         Container pallet = new Container();
 
@@ -85,53 +81,18 @@ public class sortingProcess {
                 System.out.println("pallet pulled out");
             }
 
-            if ( !pallet.isEmpty() && oldTable.isEmpty() && cutoffTable.isEmpty() && newTable.isEmpty()) {
-
-                LocalDate oldestDate = jason.findOldestDate(pallet.getContents());
-                LocalDate newestDate = jason.findNewestDate(pallet.getContents());
-
-                int cutoff = (oldestDate.getYear() + newestDate.getYear()) / 2;
-
-                oldTable.setDates(oldestDate.getYear(), oldestDate.getMonthValue(), oldestDate.getDayOfMonth(), cutoff - 1, 12, 31);
-                cutoffTable.setDates(cutoff, 1, 1, cutoff, 12, 31);
-                newTable.setDates(cutoff + 1, 1, 1, newestDate.getYear(), newestDate.getMonthValue(), newestDate.getDayOfMonth());
-
-                // Finding the oldest and the newest dates
-                jason.separateDate(oldTable, pallet.getContents());
-                jason.separateDate(cutoffTable, pallet.getContents());
-                jason.separateDate(newTable, pallet.getContents());
-
-                // Volunteer may make mistakes, this will result in the pallet having leftover items
-                // These items are put into the waste bin for later counting.
-                bin.getContents().addAll(pallet.getContents());
-
-                // Clear the pallet
-                pallet.getContents().clear();
-
-                maxMinutes = 30;
-
-                System.out.println("Put on tables.");
-
-            }
-
-            if ( !oldTable.isEmpty() || !cutoffTable.isEmpty() || !newTable.isEmpty() ) {
+            if ( !stock.isEmpty() ) {
 
                 // This moves all the items into the stocks
                 // output rack is there because if the stock is full then its put to the outputRack.
-                jason.separateCategory(oldStock, oldTable, outputRack);
-                jason.separateCategory(oldStock, cutoffTable, outputRack);
+                jason.separateCategory(stock, pallet.getContents(), outputRack);
 
-                jason.separateCategory(newStock, newTable, outputRack);
 
                 // Volunteer may make mistakes, this will result in the table having leftover items
                 // These items are put into the waste bin for later counting.
-                bin.getContents().addAll(oldTable.getContents());
-                bin.getContents().addAll(cutoffTable.getContents());
-                bin.getContents().addAll(newTable.getContents());
+                bin.getContents().addAll(pallet.getContents());
 
-                oldTable.getContents().clear();
-                newTable.getContents().clear();
-                cutoffTable.getContents().clear();
+                pallet.getContents().clear();
 
                 maxMinutes = 90;
 
@@ -151,6 +112,8 @@ public class sortingProcess {
         int countDefective = 0;
         int itemCount = 0;
 
+        Random rand = new Random();
+
         if (outputRack.isEmpty()) {
             return 0;
         }
@@ -159,19 +122,7 @@ public class sortingProcess {
         System.out.println("  Shipping out " + shipmentSize + " pallets on " + date);
 
         for (int i = 0; i < shipmentSize && !outputRack.isEmpty(); i++) {
-            int index = -1;
-            for (int j = 0; j < outputRack.size(); j++) {
-                if (outputRack.get(j).isOld()) {
-                    index = j;
-                    break;
-                }
-            }
-            if (index == -1) {
-                index = 0;
-            }
-
-            Container shipped = outputRack.get(index);
-
+            Container shipped = outputRack.get(rand.nextInt(outputRack.size()));
             while (!shipped.isEmpty()) {
                 if (shipped.getContents().getFirst().getExpDate().isBefore(date)) {
                     bin.addItem(shipped.getContents().getFirst());
@@ -185,13 +136,12 @@ public class sortingProcess {
                 itemCount++;
             }
 
-            outputRack.remove(index);
+            outputRack.remove(shipped);
             count++;
         }
 
         System.out.println("     Defective: " + countDefective + " Expired: " + countExpired + " TOTAL ITEMS: " + itemCount);
         return count;
     }
-
 
 }

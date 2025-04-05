@@ -1,4 +1,5 @@
 import java.awt.event.ItemEvent;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class Container {
@@ -6,6 +7,7 @@ public class Container {
     private String type;
     private ArrayList<Item> contents = new ArrayList<Item>();
     private int maxItems = 1000;
+    private boolean isOld;
 
     public Container() {
 
@@ -15,10 +17,10 @@ public class Container {
         this.type = type;
     }
 
-    public void initializeBatch(int num) {
+    public void initializeBatch(int num, LocalDate currentDate) {
         this.setType("NULL");
         for (int i = 0; i < num; i++) {
-            this.addItem(new Item());
+            this.addItem(new Item(currentDate));
         }
     }
 
@@ -50,6 +52,14 @@ public class Container {
 
     public boolean isFull() {
         return contents.size() >= maxItems;
+    }
+
+    public void setOld(boolean old) {
+        this.isOld = old;
+    }
+
+    public boolean isOld() {
+        return this.isOld;
     }
     
 }

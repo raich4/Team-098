@@ -63,32 +63,70 @@ public class Worker {
         }
     }
 
-    public void separateCategory(ArrayList<Container> stock, ArrayList<Item> table, ArrayList<Container> outputRack) {
-
+    public void separateCategory(ArrayList<Container> stock, Table table, ArrayList<Container> outputRack) {
         Random rand = new Random();
 
-        // Note we reverse traverse here due to removing elements changing the index.
-        for (int j = 0; j < stock.size(); j++) { // Outer loop for all categories.
-            for (int i = table.size() - 1; i >= 0; i--) { // Inner loop for all items on a table
+        // Loop through each stock container (by category)
+        for (int j = 0; j < stock.size(); j++) {
+            // Reverse traverse the table to safely remove items
+            for (int i = table.getContents().size() - 1; i >= 0; i--) {
                 if (rand.nextDouble() < placeErrorRate) {
                     continue;
                 }
 
-                if ( table.get(i).getType().equals( stock.get(j).getType() ) ) {
-                    // Transfer the items into the outputRack if it is full.
+                if (table.getContents().get(i).getType().equals(stock.get(j).getType())) {
+                    // First, add the item to the container.
+                    stock.get(j).addItem(table.getContents().get(i));
+                    table.getContents().remove(i);
+
+                    // Then check if the container is now full.
                     if (stock.get(j).isFull()) {
-                        outputRack.add(stock.get(j));
-                        stock.get(j).getContents().clear();
+                        if (table.isOld()) {
+                            stock.get(j).setOld(true);
+                            outputRack.add(stock.get(j));
+                        }
+                        else {
+                            stock.get(j).setOld(false);
+                            outputRack.add(stock.get(j));
+                        }
+
+                        // Replace with a new empty container of the same type.
+                        stock.set(j, new Container(stock.get(j).getType()));
                     }
-
-                    stock.get(j).addItem( table.get(i) );
-                    table.remove(i);
                 }
-
-
             }
         }
-
     }
+
+
+    public void separateCategory(ArrayList<Container> stock, ArrayList<Item> table, ArrayList<Container> outputRack) {
+        Random rand = new Random();
+
+        // Loop through each stock container (by category)
+        for (int j = 0; j < stock.size(); j++) {
+            // Reverse traverse the table to safely remove items
+            for (int i = table.size() - 1; i >= 0; i--) {
+                if (rand.nextDouble() < placeErrorRate) {
+                    continue;
+                }
+
+                if (table.get(i).getType().equals(stock.get(j).getType())) {
+                    // First, add the item to the container.
+                    stock.get(j).addItem(table.get(i));
+                    table.remove(i);
+
+                    // Then check if the container is now full.
+                    if (stock.get(j).isFull()) {
+                        outputRack.add(stock.get(j));
+
+                        // Replace with a new empty container of the same type.
+                        stock.set(j, new Container(stock.get(j).getType()));
+                    }
+                }
+            }
+        }
+    }
+
+
 
 }

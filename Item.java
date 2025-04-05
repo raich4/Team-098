@@ -1,5 +1,6 @@
 import java.time.LocalDate;
 import java.util.Random;
+import java.time.temporal.ChronoUnit;
 
 public class Item {
     private String type;
@@ -7,21 +8,25 @@ public class Item {
     private boolean isDefective;
 
     // No argument constructor for an item. This randomizes every value in a reasonable way.
-    public Item() {
+    public Item(LocalDate currentDate) {
         Random rand = new Random();
 
         // Assign item a random type, from the GlobalInfoHelper class.
         // We are only taking into account the items with an expiry date.
         this.type = GlobalInfoHelper.Categories[rand.nextInt(39)];
 
-        // Assigning each item a random expiry date between 2024 and 2026.
-        int year = rand.nextInt(3) + 2024;         // 2024, 2025, or 2026
-        int month = rand.nextInt(12) + 1;            // 1 to 12
-        // Create a temporary date to determine the maximum day in that month.
-        int maxDay = LocalDate.of(year, month, 1).lengthOfMonth();
-        int day = rand.nextInt(maxDay) + 1;          // 1 to maxDay
+        // Define the range: from tomorrow until three years from currentDate
+        LocalDate start = currentDate.plusDays(1);
+        LocalDate end = currentDate.plusYears(3);
 
-        this.expiryDate = LocalDate.of(year, month, day);
+        // Calculate the number of days between start and end.
+        long daysBetween = ChronoUnit.DAYS.between(start, end);
+
+        // Pick a random number of days in that interval.
+        long randomOffset = rand.nextInt((int) daysBetween + 1);
+
+        // Set the expiry date.
+        this.expiryDate = start.plusDays(randomOffset);
 
         // Assume every item has a 1% chance to be defective.
         this.isDefective = (rand.nextInt(100) == 0);
