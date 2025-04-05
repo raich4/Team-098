@@ -10,7 +10,7 @@ public class sortingProcess {
 
         LocalDate currentDate = LocalDate.of(2024,1,1);
         int simulationDays = 30; // Total days to simulate
-        int dailyShipmentSize = 9; // Placeholder shipment size
+        int dailyShipmentSize = 1; // Placeholder shipment size
 
         ArrayList<Container> inputRack = new ArrayList<>();
 
@@ -27,18 +27,22 @@ public class sortingProcess {
         ArrayList<Container> outputRack = new ArrayList<>();
 
         Container bin = new Container();
+        int count = 0;
 
         // Main simulation loop: each iteration is one day
         for (int day = 0; day < simulationDays; day++) {
             System.out.println("Simulation Date: " + currentDate);
 
-            itemArrives(inputRack, 9);
+            itemArrives(inputRack, 7);
             // Simulate the sorting process during the day
             // This can be broken down further into smaller time steps if needed
             simulateSortingForDay(inputRack, oldStock, newStock, bin, outputRack);
 
             // Process daily shipment at the end of the day
-            processDailyShipment(dailyShipmentSize, currentDate, outputRack, bin);
+            count += processDailyShipment(dailyShipmentSize, currentDate, outputRack, bin);
+
+            System.out.println("Input rack size: " + inputRack.size());
+            System.out.println("Output rack size: " + outputRack.size());
 
             // Move to the next day
             currentDate = currentDate.plusDays(1);
@@ -46,7 +50,7 @@ public class sortingProcess {
         }
 
         int binCount = bin.getContents().size();
-        double waste = ((double)binCount / (simulationDays * 1000 * dailyShipmentSize) ) * 100;
+        double waste = ((double)binCount / (simulationDays * 1000 * count) ) * 100;
 
         System.out.println("Waste: " + waste + "%");
     }
@@ -79,6 +83,8 @@ public class sortingProcess {
                 inputRack.removeFirst();
 
                 maxMinutes = 5;
+
+                System.out.println("pallet pulled out");
             }
 
             if ( !pallet.isEmpty() && oldTable.isEmpty() && cutoffTable.isEmpty() && newTable.isEmpty()) {
@@ -97,11 +103,16 @@ public class sortingProcess {
                 jason.separateDate(cutoffTable, pallet.getContents());
                 jason.separateDate(newTable, pallet.getContents());
 
+                // Volunteer may make mistakes, this will result in the pallet having leftover items
+                // These items are put into the waste bin for later counting.
                 bin.getContents().addAll(pallet.getContents());
 
+                // Clear the pallet
                 pallet.getContents().clear();
 
                 maxMinutes = 30;
+
+                System.out.println("Put on tables.");
 
             }
 
@@ -122,34 +133,43 @@ public class sortingProcess {
 
                 maxMinutes = 60;
 
+                System.out.println("Put in categories.");
+
             }
 
+            System.out.println("Original time: " + timeOfDay.);
             timeOfDay = timeOfDay.plusMinutes(maxMinutes);
 
         }
 
     }
 
-    private static void processDailyShipment(int shipmentSize, LocalDate date, ArrayList<Container> outputRack, Container bin) {
+    private static int processDailyShipment(int shipmentSize, LocalDate date, ArrayList<Container> outputRack, Container bin) {
+        int count = 0;
+
         if (outputRack.isEmpty()) {
-            return;
+            return 0;
         }
 
         // Process shipping logic
         System.out.println("  Shipping out " + shipmentSize + " pallets on " + date);
 
-        Random rand = new Random();
         for (int i = 0; i < shipmentSize && !outputRack.isEmpty(); i++) {
             Container shipped = outputRack.getFirst();
             while (!shipped.isEmpty()) {
                 if (shipped.getContents().getFirst().getExpDate().isBefore(date)) {
                     bin.addItem(shipped.getContents().getFirst());
                 }
+                else if (shipped.getContents().getFirst().isDefective()) {
+                    bin.addItem(shipped.getContents().getFirst());
+                }
                 shipped.getContents().removeFirst();
             }
 
             outputRack.removeFirst();
+            count++;
         }
+        return count;
     }
 
 
