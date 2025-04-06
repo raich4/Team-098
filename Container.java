@@ -61,5 +61,15 @@ public class Container {
     public boolean isOld() {
         return this.isOld;
     }
+
+    public LocalDate findOldestDate() {
+        LocalDate oldest = contents.getFirst().getExpDate();
+        for (int i = 0; i < this.contents.size(); i++) {
+            if (contents.get(i).getExpDate().isBefore(oldest)) {
+                oldest = contents.get(i).getExpDate();
+            }
+        }
+        return oldest;
+    }
     
 }

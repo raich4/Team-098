@@ -6,8 +6,8 @@ public class sortingProcess {
 
     public static void main(String[] args) {
 
-        LocalDate currentDate = LocalDate.of(2023,6,1);
-        int simulationDays = 365; // Total days to simulate
+        LocalDate currentDate = LocalDate.of(2022,6,1);
+        int simulationDays = 600; // Total days to simulate
         int dailyShipmentSize = 4; // Placeholder shipment size
 
         ArrayList<Container> inputRack = new ArrayList<>();
@@ -103,7 +103,8 @@ public class sortingProcess {
 
                 // Volunteer may make mistakes, this will result in the pallet having leftover items
                 // These items are put into the waste bin for later counting.
-                bin.getContents().addAll(pallet.getContents());
+                //System.out.println(pallet.getContents().size() + " ITEMS PUT IN TO THE BIN!!! WASTEFUL!");
+                //bin.getContents().addAll(pallet.getContents());
 
                 // Clear the pallet
                 pallet.getContents().clear();
@@ -128,6 +129,10 @@ public class sortingProcess {
                 bin.getContents().addAll(oldTable.getContents());
                 bin.getContents().addAll(cutoffTable.getContents());
                 bin.getContents().addAll(newTable.getContents());
+
+                System.out.println(oldTable.getContents().size() + " ITEMS PUT IN TO THE BIN!!! WASTEFUL!");
+                System.out.println(cutoffTable.getContents().size() + " ITEMS PUT IN TO THE BIN!!! WASTEFUL!");
+                System.out.println(newTable.getContents().size() + " ITEMS PUT IN TO THE BIN!!! WASTEFUL!");
 
                 oldTable.getContents().clear();
                 newTable.getContents().clear();
@@ -159,15 +164,13 @@ public class sortingProcess {
         System.out.println("  Shipping out " + shipmentSize + " pallets on " + date);
 
         for (int i = 0; i < shipmentSize && !outputRack.isEmpty(); i++) {
-            int index = -1;
+            int index = 0;
+            LocalDate oldest = outputRack.getFirst().getContents().getFirst().getExpDate();
             for (int j = 0; j < outputRack.size(); j++) {
-                if (outputRack.get(j).isOld()) {
+                if (outputRack.get(j).findOldestDate().isBefore(oldest)) {
+                    oldest = outputRack.get(j).findOldestDate();
                     index = j;
-                    break;
                 }
-            }
-            if (index == -1) {
-                index = 0;
             }
 
             Container shipped = outputRack.get(index);

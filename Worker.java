@@ -55,7 +55,7 @@ public class Worker {
                   batch.get(i).getExpDate().equals(table.getNewestDate()))
                   &&
                   (batch.get(i).getExpDate().isAfter(table.getOldestDate()) ||
-                  batch.get(i).getExpDate().equals(table.getNewestDate()) ) ) {
+                  batch.get(i).getExpDate().equals(table.getOldestDate()) ) ) {
 
                 table.addItem(batch.get(i));
                 batch.remove(i);

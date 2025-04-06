@@ -8,7 +8,7 @@ public class originalSortingProcess {
     public static void main(String[] args) {
 
         LocalDate currentDate = LocalDate.of(2023,6,1);
-        int simulationDays = 365; // Total days to simulate
+        int simulationDays = 600; // Total days to simulate
         int dailyShipmentSize = 4; // Placeholder shipment size
 
         ArrayList<Container> inputRack = new ArrayList<>();
@@ -61,7 +61,7 @@ public class originalSortingProcess {
 
         LocalTime timeOfDay = LocalTime.of(9, 30);
 
-        Worker jason = new Worker("Jason", 0.01, 0.01);
+        Worker jason = new Worker("Jason", 0.02, 0.02);
 
         Table oldTable = new Table();
         Table cutoffTable = new Table();
@@ -90,6 +90,7 @@ public class originalSortingProcess {
 
                 // Volunteer may make mistakes, this will result in the table having leftover items
                 // These items are put into the waste bin for later counting.
+                System.out.println(pallet.getContents().size() + " ITEMS PUT IN TO THE BIN!!! WASTEFUL!");
                 bin.getContents().addAll(pallet.getContents());
 
                 pallet.getContents().clear();
