@@ -8,8 +8,8 @@ public class originalSortingProcess {
     public static void main(String[] args) {
 
         LocalDate currentDate = LocalDate.of(2023,6,1);
-        int simulationDays = 600; // Total days to simulate
-        int dailyShipmentSize = 4; // Placeholder shipment size
+        int simulationDays = 365; // Total days to simulate
+        int dailyShipmentSize = 3; // Placeholder shipment size
 
         ArrayList<Container> inputRack = new ArrayList<>();
 
@@ -26,6 +26,13 @@ public class originalSortingProcess {
         // Main simulation loop: each iteration is one day
         for (int day = 0; day < simulationDays; day++) {
             System.out.println("Simulation Date: " + currentDate);
+
+            if (currentDate.getDayOfMonth() == 6 || currentDate.getDayOfMonth() == 2) {
+                dailyShipmentSize = 4;
+            }
+            else {
+                dailyShipmentSize = 2;
+            }
 
             itemArrives(inputRack, 4, currentDate);
             // Simulate the sorting process during the day
@@ -61,7 +68,7 @@ public class originalSortingProcess {
 
         LocalTime timeOfDay = LocalTime.of(9, 30);
 
-        Worker jason = new Worker("Jason", 0.02, 0.02);
+        Worker jason = new Worker("Jason", 0.01, 0.01);
 
         Table oldTable = new Table();
         Table cutoffTable = new Table();
@@ -71,7 +78,7 @@ public class originalSortingProcess {
 
         while(!timeOfDay.isAfter(LocalTime.of(15,0))) {
 
-            int maxMinutes = 0;
+            int maxMinutes = 5;
             if (pallet.isEmpty() && !inputRack.isEmpty()){
                 pallet = inputRack.getFirst();
                 inputRack.removeFirst();

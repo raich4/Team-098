@@ -16,7 +16,7 @@ public class Item {
         this.type = GlobalInfoHelper.Categories[rand.nextInt(39)];
 
         // Define the range: from tomorrow until three years from currentDate
-        LocalDate start = currentDate.plusDays(1);
+        LocalDate start = currentDate.plusDays(30);
         LocalDate end = currentDate.plusYears(3);
 
         // Calculate the number of days between start and end.
